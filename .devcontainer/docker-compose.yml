@@ -1,0 +1,87 @@
+# .devcontainer/docker-compose.yml
+version: '1.0'
+
+services:
+  app:
+    # Dockerfile を使ってイメージをビルド
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Pythonのバージョンを指定
+        PYTHON_VERSION: '3.11'
+
+    volumes:
+      # ローカルのプロジェクトフォルダ全体をコンテナのワークスペースにマウント
+      # '..' は docker-compose.yml が .devcontainer ディレクトリにあるため、
+      # その親ディレクトリ（プロジェクトルート）を指す
+      - ..:/workspaces/kindle-chatter:cached
+
+    # 環境変数
+    environment:
+      # PostgreSQL 接続情報 (メイン用)
+      MAIN_DB_URL: postgresql://postgres:postgres@db_main:5432/pg_main
+      MAIN_DB_HOST: db_main
+      MAIN_DB_PORT: 5432
+      MAIN_DB: pg_main
+      MAIN_DB_USER: postgres
+      MAIN_DB_PASSWORD: postgres
+      # PostgreSQL 接続情報 (認証用)
+      AUTH_DB_URL: postgresql://postgres:postgres@db_auth:5432/pg_auth
+      AUTH_DB_HOST: db_auth
+      AUTH_DB_PORT: 5432
+      AUTH_DB: pg_auth
+      AUTH_DB_USER: postgres
+      AUTH_DB_PASSWORD: postgres
+      # Python の設定 (バッファリング無効化など)
+      PYTHONUNBUFFERED: 1
+
+    # コンテナを起動し続けるためのコマンド
+    command: sleep infinity
+
+    # データベースコンテナ(db)が起動してからappコンテナを起動する
+    depends_on:
+      - db_main
+      - db_auth
+
+    #db_mainンテナ内のワーキングディレクトリ
+    working_dir: /workspaces/kindle-chatter
+
+  db_main:
+    # 公式のPostgreSQLイメージを使用
+    image: postgres:16
+    container_name: postgres_main
+    restart: unless-stopped
+    volumes:
+      # DBデータを永続化するための名前付きボリューム
+      - postgres_data_main:/var/lib/postgresql/data
+    environment:
+      # PostgreSQL の設定 (appサービスの環境変数と合わせる)
+      POSTGRES_DB: pg_main
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    # expose:
+    #   # コンテナ間通信用にポートを開放 (ホストには公開しない)
+    #   - 5432
+
+  # 認証情報用DB
+  db_auth:
+    image: postgres:16
+    container_name: postgres_auth
+    restart: unless-stopped
+    volumes:
+      - postgres_data_auth:/var/lib/postgresql/data
+    environment:
+      # PostgreSQL の設定 (appサービスの環境変数と合わせる)
+      POSTGRES_DB: pg_auth
+      POSTGRES_USER: postgres_auth
+      POSTGRES_PASSWORD: postgres_auth
+    ports:
+      - "5433:5432" # ホストの5433番ポートをコンテナの5432番にマッピング
+
+volumes:
+  # DBデータ永続化用の名前付きボリューム定義
+  postgres_data_main:
+  postgres_data_auth:

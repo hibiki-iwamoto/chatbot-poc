@@ -1,0 +1,43 @@
+// .devcontainer/devcontainer.json
+{
+    "name": "Kindle Chatter",
+    // docker-compose.yml を使って複数のコンテナ（アプリ用とDB用）を定義・起動
+    "dockerComposeFile": "docker-compose.yml",
+
+    // docker-compose.yml 内のどのサービスを開発コンテナとして使用するか指定
+    "service": "app",
+
+    // VS Code がコンテナ内で開くフォルダを指定
+    "workspaceFolder": "/workspaces/kindle-chatter",
+
+    // コンテナが作成された後に実行するコマンド
+    // DBマイグレーション
+    "postCreateCommand": "echo 'Container created.'",
+
+    // VS Code の設定（コンテナ内）
+    "customizations": {
+        "vscode": {
+            // 推奨される拡張機能
+            "extensions": [
+                "ms-python.python",              // Python 拡張機能
+                "ms-python.debugpy",             // Python デバッガー
+                "ms-python.vscode-pylance",      // Python 言語サーバー
+                "ms-python.autopep8",            // PEP8
+                "ms-azuretools.vscode-docker",   // Docker 拡張機能
+                "tamasfe.even-better-toml",      // TOML ファイル用 (pyproject.toml)
+                "batisteo.vscode-django",        // Django テンプレート用
+                "ms-ossdata.vscode-pgsql"        // PostgreSQL ビューア
+            ],
+            "settings": {
+                // Pythonインタープリターのパスを Poetry が管理するものに設定
+                "python.defaultInterpreterPath": "/usr/local/bin/python"
+            }
+        }
+    },
+
+    // ポートフォワーディング
+    "forwardPorts": [8000, 5432],
+
+    // コンテナ内で使用するユーザー 
+    "remoteUser": "vscode"
+}
