@@ -38,6 +38,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'django_otp.plugins.otp_email', 
+    'two_factor',
+    'two_factor.plugins.email',
+    "mainapp",
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -48,6 +56,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'django_otp.middleware.OTPMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
 ROOT_URLCONF = "sandbox.urls"
@@ -134,3 +144,19 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+#LOGIN_URL = '/login/'
+LOGIN_URL = 'two_factor:login'
+#LOGIN_REDIRECT_URL = '/mainapp/'
+LOGIN_REDIRECT_URL = 'two_factor:profile'
+LOGOUT_REDIRECT_URL = '/login/'
+
+# django-two-factor-auth の電話認証メソッドを無効化する
+TWO_FACTOR_PHONE_METHODS = [] 
+
+OTP_EMAIL_SENDER = 'hibiki.iwamoto.ict@gmail.com'
+OTP_EMAIL_SUBJECT = 'OTP token'
+OTP_EMAIL_BODY_TEMPLATE = ''
+OTP_EMAIL_TOKEN_VALIDITY = 300
+OTP_EMAIL_COOLDOWN_DURATION = 60
+OTP_EMAIL_THROTTLE_FACTOR = 1
