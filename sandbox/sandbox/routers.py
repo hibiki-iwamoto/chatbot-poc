@@ -5,7 +5,7 @@ class AuthRouter:
     'auth' アプリケーションのモデルに関するすべてのデータベース操作を
     'auth_db' に向けるためのルーター。
     """
-    route_app_labels = {'auth', 'contenttypes', 'sessions', 'admin', 'two_factor', 'django_otp'}
+    route_app_labels = {'auth', 'contenttypes', 'sessions', 'admin', 'otp_static', 'otp_totp', 'otp_email'}
 
     def db_for_read(self, model, **hints):
         """
